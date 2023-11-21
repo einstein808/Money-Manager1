@@ -29,7 +29,7 @@ export default function Create() {
 
   return (
     <View style={styles.container}>
-      <Button title='Logar' onPress={autenticar} />
+
     </View>
   );
 }

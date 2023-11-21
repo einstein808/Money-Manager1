@@ -4,6 +4,7 @@ import { Button, StyleSheet, Text, View } from 'react-native';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from './firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { salvarUsuario, obterUsuario, removerUsuario } from './auth';
 
 export default function Login() {
   const [user, setUser] = useState(null);
@@ -14,9 +15,9 @@ export default function Login() {
   // Função para carregar o usuário salvo no AsyncStorage ao iniciar o aplicativo
   const carregarUsuario = async () => {
     try {
-      const usuarioSalvo = await AsyncStorage.getItem('usuario');
+      const usuarioSalvo = await obterUsuario();
       if (usuarioSalvo) {
-        setUser(JSON.parse(usuarioSalvo));
+        setUser(usuarioSalvo);
       }
     } catch (error) {
       console.error('Erro ao carregar usuário do AsyncStorage:', error.message);
@@ -27,31 +28,35 @@ export default function Login() {
     carregarUsuario(); // Chama a função ao montar o componente
   }, []); // O segundo argumento vazio garante que a função seja chamada apenas uma vez
 
+  
   const autenticar = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
       const loggedInUser = userCredential.user;
-
+  
       setUser(loggedInUser);
       // Salva o usuário no AsyncStorage ao fazer login
-      await AsyncStorage.setItem('usuario', JSON.stringify(loggedInUser));
+      await salvarUsuario(loggedInUser);
       console.log('Usuário logado com sucesso:', loggedInUser);
     } catch (error) {
       console.error('Erro ao fazer login:', error.message);
     }
   };
+  
 
   const deslogar = async () => {
     try {
       await signOut(auth);
       setUser(null);
       // Remove o usuário do AsyncStorage ao fazer logout
-      await AsyncStorage.removeItem('usuario');
+      await removerUsuario();
       console.log('Usuário deslogado com sucesso');
     } catch (error) {
       console.error('Erro ao fazer logout:', error.message);
     }
   };
+
+  
 
   return (
     <View style={styles.container}>
