@@ -9,6 +9,8 @@ export default function LivrosRazaoPage() {
   const [user, setUser] = useState(null);
   const [livrosRazao, setLivrosRazao] = useState([]);
   const [selectedLivro, setSelectedLivro] = useState(null);
+  const [registros, setRegistros] = useState([]);
+  const [valorTotal, setValorTotal] = useState(0);
 
   useEffect(() => {
     carregarUsuario();
@@ -19,6 +21,16 @@ export default function LivrosRazaoPage() {
       carregarLivrosRazao();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (selectedLivro) {
+      carregarRegistrosPorLivro();
+    }
+  }, [selectedLivro]);
+
+  useEffect(() => {
+    calcularValorTotal();
+  }, [registros]);
 
   const carregarUsuario = async () => {
     try {
@@ -45,8 +57,6 @@ export default function LivrosRazaoPage() {
         });
 
         setLivrosRazao(livros);
-
-        // Seleciona o primeiro livro como padrão, você pode ajustar isso conforme necessário
         if (livros.length > 0) {
           setSelectedLivro(livros[0].id);
         }
@@ -54,6 +64,35 @@ export default function LivrosRazaoPage() {
     } catch (error) {
       console.error('Erro ao carregar livros razão:', error.message);
     }
+  };
+
+  const carregarRegistrosPorLivro = async () => {
+    try {
+      if (selectedLivro) {
+        const registrosRef = collection(db, 'registro');
+        const q = query(registrosRef, where('livrorazaoID', '==', selectedLivro));
+        const querySnapshot = await getDocs(q);
+
+        const registrosDoLivro = [];
+        querySnapshot.forEach((doc) => {
+          registrosDoLivro.push({ 
+            data: doc.data().data,
+            descricao: doc.data().descricao,
+            valor: doc.data().valor,
+            // Outros campos do registro conforme necessário
+          });
+        });
+
+        setRegistros(registrosDoLivro);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar registros do livro razão:', error.message);
+    }
+  };
+
+  const calcularValorTotal = () => {
+    const total = registros.reduce((acc, registro) => acc + registro.valor, 0);
+    setValorTotal(total);
   };
 
   return (
@@ -74,7 +113,18 @@ export default function LivrosRazaoPage() {
           {selectedLivro && (
             <View>
               <Text>Livro selecionado: {selectedLivro}</Text>
-              {/* Exiba os detalhes do livro selecionado conforme necessário */}
+
+              <Text>Registros do Livro Razão:</Text>
+              {registros.map((registro, index) => (
+                <View key={index}>
+                  <Text>Data: {registro.data}</Text>
+                  <Text>Descrição: {registro.descricao}</Text>
+                  <Text>Valor: {registro.valor}</Text>
+                  {/* Outros campos do registro conforme necessário */}
+                </View>
+              ))}
+
+              <Text>Valor Total: {valorTotal}</Text>
             </View>
           )}
         </View>
