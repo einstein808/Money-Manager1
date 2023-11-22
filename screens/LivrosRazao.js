@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Button, StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import { collection, getDocs, query, where } from '../db/firebase';
-import { obterUsuario } from '../db/auth'; // Importa a função obterUsuario do arquivo auth.js
+import { obterUsuario } from '../db/auth'; 
 import { db } from '../db/firebase';
 
 export default function LivrosRazaoPage() {
   const [user, setUser] = useState(null);
   const [livrosRazao, setLivrosRazao] = useState([]);
+  const [selectedLivro, setSelectedLivro] = useState(null);
 
   useEffect(() => {
-    carregarUsuario(); // Chama a função ao montar o componente
-  }, []); // O segundo argumento vazio garante que as funções sejam chamadas apenas uma vez
+    carregarUsuario();
+  }, []);
 
   useEffect(() => {
     if (user) {
-      carregarLivrosRazao(); // Carrega os livros razão quando o usuário está autenticado
+      carregarLivrosRazao();
     }
-  }, [user]); // Executa quando o usuário é alterado
+  }, [user]);
 
   const carregarUsuario = async () => {
     try {
@@ -32,20 +34,22 @@ export default function LivrosRazaoPage() {
   const carregarLivrosRazao = async () => {
     try {
       if (user) {
-        // Obtém o ID do usuário da referência no campo userID do livrorazao
         const userID = user.uid;
-
-        // Consulta os livros da razão do usuário
         const livrosRazaoRef = collection(db, 'livrorazao');
         const q = query(livrosRazaoRef, where('userID', '==', userID));
         const querySnapshot = await getDocs(q);
 
         const livros = [];
         querySnapshot.forEach((doc) => {
-          livros.push({ id: doc.id, ...doc.data() });
+          livros.push({ nome: doc.data().nome, id: doc.id });
         });
 
         setLivrosRazao(livros);
+
+        // Seleciona o primeiro livro como padrão, você pode ajustar isso conforme necessário
+        if (livros.length > 0) {
+          setSelectedLivro(livros[0].id);
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar livros razão:', error.message);
@@ -57,18 +61,22 @@ export default function LivrosRazaoPage() {
       {user ? (
         <View>
           <Text>Bem-vindo, {user.email}!</Text>
-          {/* <Button  title='carregar' onPress={carregarLivrosRazao}/> */}
 
-          <FlatList
-            data={livrosRazao}
-            keyExtractor={(livro) => livro.id}
-            renderItem={({ item }) => (
-              <View>
-                <Text>{item.nome}</Text>
-                {/* Adicione outros campos do livro razão conforme necessário */}
-              </View>
-            )}
-          />
+          <Picker
+            selectedValue={selectedLivro}
+            onValueChange={(itemValue) => setSelectedLivro(itemValue)}
+          >
+            {livrosRazao.map((livro) => (
+              <Picker.Item key={livro.id} label={livro.nome} value={livro.id} />
+            ))}
+          </Picker>
+
+          {selectedLivro && (
+            <View>
+              <Text>Livro selecionado: {selectedLivro}</Text>
+              {/* Exiba os detalhes do livro selecionado conforme necessário */}
+            </View>
+          )}
         </View>
       ) : (
         <></>
