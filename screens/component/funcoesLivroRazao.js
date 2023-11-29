@@ -42,7 +42,6 @@ export const carregarRegistrosPorLivro = async (
           data: doc.data().data,
           descricao: doc.data().descricao,
           valor: doc.data().valor,
-          // Outros campos do registro conforme necessário
         });
       });
 
@@ -57,18 +56,16 @@ export const adicionarRegistro = async (novoRegistro) => {
   try {
     const registrosRef = collection(db, 'registro');
 
-    // Add a new record to the 'registro' collection
     await addDoc(registrosRef, {
       
       data: novoRegistro.data,
       descricao: novoRegistro.descricao,
       valor: novoRegistro.valor,
       livrorazaoID: novoRegistro.livrorazaoID
-      // Add other fields as needed
     });
   } catch (error) {
     console.error('Erro ao adicionar registro:', error.message);
-    throw error; // Re-throw the error to handle it in the calling function
+    throw error; 
   }
 };
 

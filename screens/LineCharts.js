@@ -4,9 +4,8 @@ import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { obterUsuario, removerUsuario} from '../db/auth';
-import { signOut } from 'firebase/auth';
-import { auth } from '../db/firebase';
+import { LineChart } from 'react-native-chart-kit';
+import { obterUsuario } from '../db/auth';
 import {
   carregarLivrosRazao,
   carregarRegistrosPorLivro,
@@ -14,7 +13,7 @@ import {
 } from './component/funcoesLivroRazao';
 import Home from './Home';
 
-export default function LivrosRazaoPage() {
+export default function LineCharts() {
   const [user, setUser] = useState(null);
   const [livrosRazao, setLivrosRazao] = useState([]);
   const [selectedLivro, setSelectedLivro] = useState(null);
@@ -52,35 +51,16 @@ export default function LivrosRazaoPage() {
       console.error('Erro ao carregar usuário:', error.message);
     }
   };
-  const deslogar = async () => {
-    try {
-      await signOut(auth);
-      setUser(null);
-      // Remove o usuário do AsyncStorage ao fazer logout
-      await removerUsuario();
-      console.log('Usuário deslogado com sucesso');
-      navigation.navigate('Login')
-    } catch (error) {
-      console.error('Erro ao fazer logout:', error.message);
-    }
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.texto}>Data: {item.data}</Text>
-      <Text style={styles.texto}>Descrição: {item.descricao}</Text>
-      <Text style={styles.texto}>Valor: {item.valor}</Text>
-      {/* Other fields as needed */}
-    </View>
-  );
 
   return (
     <SafeAreaView>
       <View>
+        {user ? (
           <View>
-            {/* Header with back arrow and Picker */}
             <View style={styles.header}>
-             <View></View>
+              <TouchableOpacity onPress={() => navigation.navigate('Registros')}>
+                <Ionicons name="arrow-back" size={24} color="black" style={{ marginLeft: 30 }} />
+              </TouchableOpacity>
 
               <Picker
                 style={styles.picker}
@@ -91,31 +71,57 @@ export default function LivrosRazaoPage() {
                   <Picker.Item key={livro.id} label={livro.nome} value={livro.id} />
                 ))}
               </Picker>
-              <TouchableOpacity onPress={deslogar}>
-                <Ionicons name="person-circle-outline" size={50} color="black" />
-              </TouchableOpacity>
+              <View></View>
             </View>
-
             <Text style={{ textAlign: 'center', fontSize: 30, marginTop: 20, marginBottom: 20 }}>
               Balanço: {valorTotal}
             </Text>
 
-            <View style={styles.utimas}>
-              <Home navigation={navigation} />
-            </View>
-
             {selectedLivro && (
-              <View style={{ marginTop: 10 }}>
-                <Text style={{ textAlign: 'center', fontSize: 20 }}>Últimos 10 registros</Text>
-                <FlatList
-                  data={registros.slice(0, 10)} // Display only the last 10 records
-                  renderItem={renderItem}
-                  keyExtractor={(item, index) => index.toString()}
+              <View style={{ marginTop: 40, marginLeft:5 }}>
+                <LineChart
+                  data={{
+                    labels: [
+                      '11-01', '211-02', '11-03', '11-04', '11-05',
+
+                    ],
+                    datasets: [
+                      {
+                        data: [
+                          200, 400, 300, 600, 800,
+                          500, 700, 300, 400, 600,
+                          900,
+                          
+                        ],
+                      },
+                    ],
+                  }}
+                  width={350} 
+                  height={220}
+                  yAxisLabel="R$"
+                  chartConfig={{
+                    backgroundColor: '#e0e0e0',
+                    backgroundGradientFrom: '#e0e0e0',
+                    backgroundGradientTo: '#e0e0e0',
+                    decimalPlaces: 2,
+                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    style: {
+                      borderRadius: 8,
+                    },
+                  }}
+                  bezier
+                  style={{
+                    marginVertical: 8,
+                    borderRadius: 8,
+                  }}
                 />
               </View>
             )}
           </View>
-       
+        ) : (
+          <></>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -125,6 +131,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    alignItems:"center",
+    justifyContent:'center'
   },
   header: {
     flexDirection: 'row',
@@ -140,7 +148,7 @@ const styles = StyleSheet.create({
   },
   utimas: {
     width: '100%',
-    height: 200, // Set a fixed height for the "utimas" view
+    height: 200, 
   },
   card: {
     backgroundColor: '#e0e0e0',

@@ -1,7 +1,7 @@
 // PostDetailsStack.js
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import PostDetails from '../postDetails'; // Ensure correct import path
+import PostDetails from '../postDetails';
 
 const Stack = createNativeStackNavigator();
 

@@ -52,7 +52,7 @@ export default function AddRecordPage({ route, navigation }) {
   };
 
   return (
-    <View style={{ padding: 16 }}>
+    <View style={{ padding: 16, marginTop:200 }}>
       <Text style={{ textAlign: 'center', fontSize: 20, marginVertical: 20 }}>
         Adicionar Registro
       </Text>

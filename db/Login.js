@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from './firebase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { salvarUsuario, obterUsuario, removerUsuario } from './auth';
+import { useNavigation } from '@react-navigation/native';
 
-export default function Login({ navigation }) {
+export default function Login() {
+  const navigation = useNavigation();
   const [user, setUser] = useState(null);
 
   const email = "gabryel808ein9755steinr@gmail.com";
@@ -36,9 +37,9 @@ export default function Login({ navigation }) {
       // Salva o usuário no AsyncStorage ao fazer login
       await salvarUsuario(loggedInUser);
       console.log('Usuário logado com sucesso:', loggedInUser);
+      navigation.navigate('Home')
 
       // Navigate to the Home screen after successful login
-      navigation.navigate('Main');
     } catch (error) {
       console.error('Erro ao fazer login:', error.message);
     }
@@ -64,7 +65,9 @@ export default function Login({ navigation }) {
           <Button title='Deslogar' onPress={deslogar} />
         </View>
       ) : (
-        <Button title='Logar' onPress={autenticar} />
+      
+      
+        <Button title='Logar' onPress={autenticar}/>
       )}
     </View>
   );

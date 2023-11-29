@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { obterUsuario } from './db/auth'; // Substitua com o caminho correto
+import { obterUsuario } from './db/auth';
 
 
 import LivrosRazaoPage from './screens/LivrosRazao';
@@ -15,7 +15,6 @@ export default function App() {
   const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
-    // Verifica se o usuário está autenticado ao carregar o componente
     verificarAutenticacao();
   }, []);
 
@@ -26,18 +25,19 @@ export default function App() {
   const Tab = createBottomTabNavigator();
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={usuario ? 'Home' : 'Login'}>
+      <Stack.Navigator initialRouteName={'Home'}>
         {usuario ? (
           <>
             <Stack.Screen name="Home" component={TabNavigation} options={{ headerShown: false }} />
             <Stack.Screen name="Registros" component={LivrosRazaoPage} />
             <Stack.Screen name="PostDetails" component={PostDetails} />
+            <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
             
             
 
           </>
         ) : (
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Logins" component={Login} />
         )}
       </Stack.Navigator>
     </NavigationContainer>

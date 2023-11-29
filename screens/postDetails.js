@@ -3,7 +3,6 @@ import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 const PostDetails = () => {
-  // Hardcoded or fake data
   const fakePost = {
     title: 'Lorem Ipsum',
     body: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
