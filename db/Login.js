@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
@@ -6,7 +5,7 @@ import { auth } from './firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { salvarUsuario, obterUsuario, removerUsuario } from './auth';
 
-export default function Login() {
+export default function Login({ navigation }) {
   const [user, setUser] = useState(null);
 
   const email = "gabryel808ein9755steinr@gmail.com";
@@ -28,21 +27,22 @@ export default function Login() {
     carregarUsuario(); // Chama a função ao montar o componente
   }, []); // O segundo argumento vazio garante que a função seja chamada apenas uma vez
 
-  
   const autenticar = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, senha);
       const loggedInUser = userCredential.user;
-  
+
       setUser(loggedInUser);
       // Salva o usuário no AsyncStorage ao fazer login
       await salvarUsuario(loggedInUser);
       console.log('Usuário logado com sucesso:', loggedInUser);
+
+      // Navigate to the Home screen after successful login
+      navigation.navigate('Main');
     } catch (error) {
       console.error('Erro ao fazer login:', error.message);
     }
   };
-  
 
   const deslogar = async () => {
     try {
@@ -55,8 +55,6 @@ export default function Login() {
       console.error('Erro ao fazer logout:', error.message);
     }
   };
-
-  
 
   return (
     <View style={styles.container}>
